@@ -23,17 +23,14 @@ var _ = Suite(&GocfgSuite{})
 
 func (s *GocfgSuite) SetUpTest(c *C) {
 	s.cfg = NewConfiguration()
-	s.yml = `
-num: 12345
-f: 1.2345
-str: some string
-b: true
-nested:
-  value: 1
-`
 	s.f, _ = ioutil.TempFile("", "gocfg")
 	s.f.Close()
-	s.cfg.Load(s.yml)
+	s.cfg.values["num"] = 12345
+	s.cfg.values["f"] = 1.2345
+	s.cfg.values["str"] = "some string"
+	s.cfg.values["b"] = true
+	s.cfg.values["nested"] = make(stringMap)
+	s.cfg.values["nested"].(stringMap)["value"] = 1
 }
 
 func (s *GocfgSuite) TearDownTest(c *C) {
@@ -49,10 +46,8 @@ func (s *GocfgSuite) TestConfigurationLoad(c *C) {
 	yml := "test: value"
 	err := s.cfg.Load(yml)
 	_, found := s.cfg.values["test"]
-	_, nestedFound := s.cfg.values["nested.value"]
 	c.Check(err, Equals, nil)
 	c.Check(found, Equals, true)
-	c.Check(nestedFound, Equals, true)
 	yml = `
 illegalyaml
 test: value
@@ -68,7 +63,11 @@ func (s *GocfgSuite) TestConfigurationSave(c *C) {
 }
 
 func (s *GocfgSuite) TestConfigurationLoadFile(c *C) {
-	yml := "test: value"
+	yml := `
+test: value
+other:
+  nested: 0
+`
 	f, _ := os.Create(s.f.Name())
 	f.WriteString(yml)
 	f.Close()
@@ -105,6 +104,8 @@ func (s *GocfgSuite) TestConfigurationGet(c *C) {
 	s.cfg.values["test"] = "value"
 	v := s.cfg.Get("test", "default")
 	c.Check(v, Equals, "value")
+	v = s.cfg.Get("nested.value", "default")
+	c.Check(v, Not(Equals), "default")
 	v = s.cfg.Get("nonexistant", "default")
 	c.Check(v, Equals, "default")
 }
@@ -202,5 +203,17 @@ func (s *GocfgSuite) BenchmarkConfigurationLoad(c *C) {
 func (s *GocfgSuite) BenchmarkConfigurationSave(c *C) {
 	for i := 0; i < c.N; i++ {
 		s.cfg.Save()
+	}
+}
+
+func (s *GocfgSuite) BenchmarkConfigurationGet(c *C) {
+	for i := 0; i < c.N; i++ {
+		s.cfg.Get("str", "default")
+	}
+}
+
+func (s *GocfgSuite) BenchmarkConfigurationGetNested(c *C) {
+	for i := 0; i < c.N; i++ {
+		s.cfg.Get("nested.value", "default")
 	}
 }

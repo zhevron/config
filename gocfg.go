@@ -6,47 +6,50 @@
 package gocfg
 
 import (
-	"fmt"
 	"io/ioutil"
 	"reflect"
+	"strings"
 
 	yaml "gopkg.in/yaml.v1"
 )
 
+type interfaceMap map[interface{}]interface{}
+type stringMap map[string]interface{}
+
 // Configuration contains the loaded configuration and functions to manipulate it.
 type Configuration struct {
-	values map[string]interface{}
+	values stringMap
 }
 
 // NewConfiguration returns a new Configuration.
 func NewConfiguration() *Configuration {
 	return &Configuration{
-		values: make(map[string]interface{}),
+		values: make(stringMap),
 	}
 }
 
 // Load parses the YAML in data to it's internal map.
-func (cfg Configuration) Load(data string) error {
-	m := make(map[interface{}]interface{})
+func (cfg *Configuration) Load(data string) error {
+	m := make(interfaceMap)
 	if err := yaml.Unmarshal([]byte(data), &m); err != nil {
 		return err
 	}
-	cfg.loadMap(m, "")
+	cfg.values = cfg.loadMap(m)
 	return nil
 }
 
 // loadMap parses a loaded map structure and adds it to the current configuration.
 // The prefix will be added before all values.
-func (cfg Configuration) loadMap(m map[interface{}]interface{}, prefix string) {
+func (cfg Configuration) loadMap(m map[interface{}]interface{}) stringMap {
+	res := make(stringMap)
 	for k, v := range m {
 		if reflect.TypeOf(v).Kind() == reflect.Map {
-			p := fmt.Sprintf("%s%s.", prefix, k.(string))
-			cfg.loadMap(v.(map[interface{}]interface{}), p)
+			res[k.(string)] = cfg.loadMap(v.(map[interface{}]interface{}))
 		} else {
-			s := fmt.Sprintf("%s%s", prefix, k.(string))
-			cfg.values[s] = v
+			res[k.(string)] = v
 		}
 	}
+	return res
 }
 
 // Save returns the current configuration in YAML format.
@@ -56,7 +59,7 @@ func (cfg Configuration) Save() (string, error) {
 }
 
 // LoadFile reads a specified file into memory and parses it using Load().
-func (cfg Configuration) LoadFile(path string) error {
+func (cfg *Configuration) LoadFile(path string) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
@@ -85,10 +88,20 @@ func (cfg Configuration) Remove(key string) {
 }
 
 // Get returns the value of the given key from the current configuration or the value of def if not found.
-// The value is returns as an interface{}.
+// The value is returned as an interface{}.
 func (cfg Configuration) Get(key string, def interface{}) interface{} {
-	if val, found := cfg.values[key]; found {
-		return val
+	return cfg.getFromMap(cfg.values, key, def)
+}
+
+// getFromMap returns the value of the given key from the specified map or the value of def if not found.
+// The value is returned as an interface{}.
+// If the key contains a dot (.), the function will be called recursively.
+func (cfg Configuration) getFromMap(m stringMap, key string, def interface{}) interface{} {
+	if n := strings.Index(key, "."); n != -1 {
+		return cfg.getFromMap(m[key[:n]].(stringMap), key[n+1:], def)
+	}
+	if v, found := m[key]; found {
+		return v
 	}
 	return def
 }
