@@ -18,6 +18,9 @@ type Configuration struct {
 	values map[string]interface{}
 }
 
+type interfaceMap map[interface{}]interface{}
+type stringMap map[string]interface{}
+
 // NewConfiguration returns a new Configuration.
 func NewConfiguration() *Configuration {
 	return &Configuration{
@@ -27,7 +30,7 @@ func NewConfiguration() *Configuration {
 
 // Load parses the YAML in data to it's internal map.
 func (cfg Configuration) Load(data string) error {
-	m := make(map[interface{}]interface{})
+	m := make(interfaceMap)
 	if err := yaml.Unmarshal([]byte(data), &m); err != nil {
 		return err
 	}
@@ -37,11 +40,11 @@ func (cfg Configuration) Load(data string) error {
 
 // loadMap parses a loaded map structure and adds it to the current configuration.
 // The prefix will be added before all values.
-func (cfg Configuration) loadMap(m map[interface{}]interface{}, prefix string) {
+func (cfg Configuration) loadMap(m interfaceMap, prefix string) {
 	for k, v := range m {
 		if reflect.TypeOf(v).Kind() == reflect.Map {
 			p := fmt.Sprintf("%s%s.", prefix, k.(string))
-			cfg.loadMap(v.(map[interface{}]interface{}), p)
+			cfg.loadMap(v.(interfaceMap), p)
 		} else {
 			s := fmt.Sprintf("%s%s", prefix, k.(string))
 			cfg.values[s] = v
