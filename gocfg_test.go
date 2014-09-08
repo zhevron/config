@@ -63,7 +63,11 @@ func (s *GocfgSuite) TestConfigurationSave(c *C) {
 }
 
 func (s *GocfgSuite) TestConfigurationLoadFile(c *C) {
-	yml := "test: value"
+	yml := `
+test: value
+other:
+  nested: 0
+`
 	f, _ := os.Create(s.f.Name())
 	f.WriteString(yml)
 	f.Close()
@@ -199,5 +203,17 @@ func (s *GocfgSuite) BenchmarkConfigurationLoad(c *C) {
 func (s *GocfgSuite) BenchmarkConfigurationSave(c *C) {
 	for i := 0; i < c.N; i++ {
 		s.cfg.Save()
+	}
+}
+
+func (s *GocfgSuite) BenchmarkConfigurationGet(c *C) {
+	for i := 0; i < c.N; i++ {
+		s.cfg.Get("str", "default")
+	}
+}
+
+func (s *GocfgSuite) BenchmarkConfigurationGetNested(c *C) {
+	for i := 0; i < c.N; i++ {
+		s.cfg.Get("nested.value", "default")
 	}
 }
