@@ -23,17 +23,14 @@ var _ = Suite(&GocfgSuite{})
 
 func (s *GocfgSuite) SetUpTest(c *C) {
 	s.cfg = NewConfiguration()
-	s.yml = `
-num: 12345
-f: 1.2345
-str: some string
-b: true
-nested:
-  value: 1
-`
 	s.f, _ = ioutil.TempFile("", "gocfg")
 	s.f.Close()
-	s.cfg.Load(s.yml)
+	s.cfg.values["num"] = 12345
+	s.cfg.values["f"] = 1.2345
+	s.cfg.values["str"] = "some string"
+	s.cfg.values["b"] = true
+	s.cfg.values["nested"] = make(stringMap)
+	s.cfg.values["nested"].(stringMap)["value"] = 1
 }
 
 func (s *GocfgSuite) TearDownTest(c *C) {
