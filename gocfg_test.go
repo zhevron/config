@@ -46,10 +46,8 @@ func (s *GocfgSuite) TestConfigurationLoad(c *C) {
 	yml := "test: value"
 	err := s.cfg.Load(yml)
 	_, found := s.cfg.values["test"]
-	_, nestedFound := s.cfg.values["nested.value"]
 	c.Check(err, Equals, nil)
 	c.Check(found, Equals, true)
-	c.Check(nestedFound, Equals, true)
 	yml = `
 illegalyaml
 test: value
@@ -102,6 +100,8 @@ func (s *GocfgSuite) TestConfigurationGet(c *C) {
 	s.cfg.values["test"] = "value"
 	v := s.cfg.Get("test", "default")
 	c.Check(v, Equals, "value")
+	v = s.cfg.Get("nested.value", "default")
+	c.Check(v, Not(Equals), "default")
 	v = s.cfg.Get("nonexistant", "default")
 	c.Check(v, Equals, "default")
 }

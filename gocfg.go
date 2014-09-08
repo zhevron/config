@@ -8,6 +8,7 @@ package gocfg
 import (
 	"io/ioutil"
 	"reflect"
+	"strings"
 
 	yaml "gopkg.in/yaml.v1"
 )
@@ -28,7 +29,7 @@ func NewConfiguration() *Configuration {
 }
 
 // Load parses the YAML in data to it's internal map.
-func (cfg Configuration) Load(data string) error {
+func (cfg *Configuration) Load(data string) error {
 	m := make(interfaceMap)
 	if err := yaml.Unmarshal([]byte(data), &m); err != nil {
 		return err
@@ -58,7 +59,7 @@ func (cfg Configuration) Save() (string, error) {
 }
 
 // LoadFile reads a specified file into memory and parses it using Load().
-func (cfg Configuration) LoadFile(path string) error {
+func (cfg *Configuration) LoadFile(path string) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
@@ -87,10 +88,20 @@ func (cfg Configuration) Remove(key string) {
 }
 
 // Get returns the value of the given key from the current configuration or the value of def if not found.
-// The value is returns as an interface{}.
+// The value is returned as an interface{}.
 func (cfg Configuration) Get(key string, def interface{}) interface{} {
-	if val, found := cfg.values[key]; found {
-		return val
+	return cfg.getFromMap(cfg.values, key, def)
+}
+
+// getFromMap returns the value of the given key from the specified map or the value of def if not found.
+// The value is returned as an interface{}.
+// If the key contains a dot (.), the function will be called recursively.
+func (cfg Configuration) getFromMap(m stringMap, key string, def interface{}) interface{} {
+	if n := strings.Index(key, "."); n != -1 {
+		return cfg.getFromMap(m[key[:n]].(stringMap), key[n+1:], def)
+	}
+	if v, found := m[key]; found {
+		return v
 	}
 	return def
 }
