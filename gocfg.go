@@ -6,25 +6,24 @@
 package gocfg
 
 import (
-	"fmt"
 	"io/ioutil"
 	"reflect"
 
 	yaml "gopkg.in/yaml.v1"
 )
 
-// Configuration contains the loaded configuration and functions to manipulate it.
-type Configuration struct {
-	values map[string]interface{}
-}
-
 type interfaceMap map[interface{}]interface{}
 type stringMap map[string]interface{}
+
+// Configuration contains the loaded configuration and functions to manipulate it.
+type Configuration struct {
+	values stringMap
+}
 
 // NewConfiguration returns a new Configuration.
 func NewConfiguration() *Configuration {
 	return &Configuration{
-		values: make(map[string]interface{}),
+		values: make(stringMap),
 	}
 }
 
@@ -34,22 +33,22 @@ func (cfg Configuration) Load(data string) error {
 	if err := yaml.Unmarshal([]byte(data), &m); err != nil {
 		return err
 	}
-	cfg.loadMap(m, "")
+	cfg.values = cfg.loadMap(m)
 	return nil
 }
 
 // loadMap parses a loaded map structure and adds it to the current configuration.
 // The prefix will be added before all values.
-func (cfg Configuration) loadMap(m interfaceMap, prefix string) {
+func (cfg Configuration) loadMap(m map[interface{}]interface{}) stringMap {
+	res := make(stringMap)
 	for k, v := range m {
 		if reflect.TypeOf(v).Kind() == reflect.Map {
-			p := fmt.Sprintf("%s%s.", prefix, k.(string))
-			cfg.loadMap(v.(interfaceMap), p)
+			res[k.(string)] = cfg.loadMap(v.(map[interface{}]interface{}))
 		} else {
-			s := fmt.Sprintf("%s%s", prefix, k.(string))
-			cfg.values[s] = v
+			res[k.(string)] = v
 		}
 	}
+	return res
 }
 
 // Save returns the current configuration in YAML format.
@@ -105,61 +104,61 @@ func (cfg Configuration) GetInt(key string, def int) int {
 // GetInt8 returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returns as an int8.
 func (cfg Configuration) GetInt8(key string, def int8) int8 {
-	return int8(cfg.Get(key, def).(int))
+	return cfg.Get(key, def).(int8)
 }
 
 // GetInt16 returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returns as an int16.
 func (cfg Configuration) GetInt16(key string, def int16) int16 {
-	return int16(cfg.Get(key, def).(int))
+	return cfg.Get(key, def).(int16)
 }
 
 // GetInt32 returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returns as an int32.
 func (cfg Configuration) GetInt32(key string, def int32) int32 {
-	return int32(cfg.Get(key, def).(int))
+	return cfg.Get(key, def).(int32)
 }
 
 // GetInt64 returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returns as an int64.
 func (cfg Configuration) GetInt64(key string, def int64) int64 {
-	return int64(cfg.Get(key, def).(int))
+	return cfg.Get(key, def).(int64)
 }
 
 // GetUint returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returns as an uint.
 func (cfg Configuration) GetUint(key string, def uint) uint {
-	return uint(cfg.Get(key, def).(int))
+	return cfg.Get(key, def).(uint)
 }
 
 // GetUint8 returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returns as an uint8.
 func (cfg Configuration) GetUint8(key string, def uint8) uint8 {
-	return uint8(cfg.Get(key, def).(int))
+	return cfg.Get(key, def).(uint8)
 }
 
 // GetUint16 returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returns as an uint16.
 func (cfg Configuration) GetUint16(key string, def uint16) uint16 {
-	return uint16(cfg.Get(key, def).(int))
+	return cfg.Get(key, def).(uint16)
 }
 
 // GetUint32 returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returns as an uint32.
 func (cfg Configuration) GetUint32(key string, def uint32) uint32 {
-	return uint32(cfg.Get(key, def).(int))
+	return cfg.Get(key, def).(uint32)
 }
 
 // GetUint64 returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returns as an uint64.
 func (cfg Configuration) GetUint64(key string, def uint64) uint64 {
-	return uint64(cfg.Get(key, def).(int))
+	return cfg.Get(key, def).(uint64)
 }
 
 // GetFloat32 returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returns as a float32.
 func (cfg Configuration) GetFloat32(key string, def float32) float32 {
-	return float32(cfg.Get(key, def).(float64))
+	return cfg.Get(key, def).(float32)
 }
 
 // GetFloat64 returns the value of the given key from the current configuration or the value of def if not found.
