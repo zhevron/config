@@ -12,6 +12,12 @@ You can install the library using Go:
 go get github.com/zhevron/gocfg
 ```
 
+You will also need to install one of the implementations:
+
+YAML: `go get github.com/zhevron/gocfg/yaml`
+
+JSON: `go get github.com/zhevron/gocfg/json`
+
 Documentation is available on [godoc.org](http://godoc.org/github.com/zhevron/gocfg)
 
 gocfg is licensed under the [MIT license](http://opensource.org/licenses/MIT).
