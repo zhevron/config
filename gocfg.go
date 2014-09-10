@@ -3,6 +3,8 @@
 // See LICENSE.md for details.
 
 // Package gocfg implements a way to easily read and write several types of configuration files.
+//
+// This package should not be used. Instead, use one of the sub-packages.
 package gocfg
 
 // Configuration is the base interface that all sub-packages implement.

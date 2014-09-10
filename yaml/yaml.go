@@ -3,6 +3,33 @@
 // See LICENSE.md for details.
 
 // Package yaml implements a way to easily read and write YAML configuration files.
+//
+// To read a configuration file, simply call the LoadFile method on a new Configuration object:
+//		import "gopkg.in/zhevron/gocfg.v1/yaml"
+//		cfg := yaml.NewConfiguration()
+//		if err := cfg.LoadFile("/path/to/file.yml"); err != nil {
+//			// Failed to load the configuration file
+//		}
+//
+// To save the current configuration to a file, call the SaveFile method:
+//		if err := cfg.SaveFile("/path/to/file.yml"); err != nil {
+//			// Failed to save the configuration file
+//		}
+//
+// You can easily access values with the Get method or any of the Get_Type_ methods:
+//		host := cfg.GetString("host", "localhost")
+//		port := cfg.GetInt("port", 10000)
+//
+// You can just as easily set a value using the Set method:
+//		cfg.Set("host", host)
+//		cfg.Set("port", port)
+//
+// Nested objects are accessed by adding a dot (.) between the value names.
+// If you have a YAML file that looks like:
+//		some:
+//			value: 1
+// The value can be accessed by calling the Get method:
+//		val := cfg.GetInt("some.value", 1)
 package yaml
 
 import (
