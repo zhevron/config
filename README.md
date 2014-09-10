@@ -15,8 +15,8 @@ go get github.com/zhevron/gocfg
 
 You will also need to install one of the implementations:
 
-YAML: `go get github.com/zhevron/gocfg/yaml`
+YAML: `go get github.com/zhevron/gocfg/yaml` [![GoDoc](https://godoc.org/github.com/zhevron/gocfg/yaml?status.svg)](https://godoc.org/github.com/zhevron/gocfg/yaml)
 
-JSON: `go get github.com/zhevron/gocfg/json`
+JSON: `go get github.com/zhevron/gocfg/json` [![GoDoc](https://godoc.org/github.com/zhevron/gocfg/json?status.svg)](https://godoc.org/github.com/zhevron/gocfg/json)
 
 gocfg is licensed under the [MIT license](http://opensource.org/licenses/MIT).
