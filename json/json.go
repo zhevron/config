@@ -5,7 +5,7 @@
 // Package json implements a way to easily read and write JSON configuration files.
 //
 // To read a configuration file, simply call the LoadFile method on a new Configuration object:
-//		import "gopkg.in/golinux-io/gocfg.v1/json"
+//		import "gopkg.in/zhevron/gocfg.v1/json"
 //		cfg := json.NewConfiguration()
 //		if err := cfg.LoadFile("/path/to/file.json"); err != nil {
 //			// Failed to load the configuration file

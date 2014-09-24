@@ -5,7 +5,7 @@
 // Package yaml implements a way to easily read and write YAML configuration files.
 //
 // To read a configuration file, simply call the LoadFile method on a new Configuration object:
-//		import "gopkg.in/golinux-io/gocfg.v1/yaml"
+//		import "gopkg.in/zhevron/gocfg.v1/yaml"
 //		cfg := yaml.NewConfiguration()
 //		if err := cfg.LoadFile("/path/to/file.yml"); err != nil {
 //			// Failed to load the configuration file
