@@ -1,32 +1,32 @@
-gocfg - Simple configuration file library
-=========================================
+config - Simple configuration file library
+==========================================
 
-[![Coverage Status](https://img.shields.io/coveralls/zhevron/gocfg.svg)](https://coveralls.io/r/zhevron/gocfg)
-[![Build Status](https://travis-ci.org/zhevron/gocfg.svg?branch=master)](https://travis-ci.org/zhevron/gocfg)
+[![Coverage Status](https://img.shields.io/coveralls/zhevron/config.svg)](https://coveralls.io/r/zhevron/config)
+[![Build Status](https://travis-ci.org/zhevron/config.svg?branch=master)](https://travis-ci.org/zhevron/config)
 
-**gocfg** is a simple configuration file library for [Go](https://golang.org/).  
+**config** is a simple configuration file library for [Go](https://golang.org/).  
 To use the library, you need to install one of the implementations below.
 
 ## JSON
 
-[![GoDoc](https://godoc.org/github.com/zhevron/gocfg/json?status.svg)](https://godoc.org/github.com/zhevron/gocfg/json)
+[![GoDoc](https://godoc.org/github.com/zhevron/config/json?status.svg)](https://godoc.org/github.com/zhevron/config/json)
 
 This implementation reads and write [JSON](http://json.org/) files.
 
 ```
-go get gopkg.in/zhevron/gocfg.v1/json
+go get gopkg.in/zhevron/config.v1/json
 ```
 
 ## YAML
 
-[![GoDoc](https://godoc.org/github.com/zhevron/gocfg/yaml?status.svg)](https://godoc.org/github.com/zhevron/gocfg/yaml)
+[![GoDoc](https://godoc.org/github.com/zhevron/config/yaml?status.svg)](https://godoc.org/github.com/zhevron/config/yaml)
 
 This implementation reads and writes [YAML](http://www.yaml.org/) files.
 
 ```
-go get gopkg.in/zhevron/gocfg.v1/yaml
+go get gopkg.in/zhevron/config.v1/yaml
 ```
 
 ## License
 
-**gocfg** is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+**config** is licensed under the [MIT license](http://opensource.org/licenses/MIT).

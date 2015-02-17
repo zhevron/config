@@ -21,7 +21,7 @@ type JSONSuite struct {
 var _ = Suite(&JSONSuite{})
 
 func (s *JSONSuite) SetUpTest(c *C) {
-	s.file, _ = ioutil.TempFile("", "gocfg")
+	s.file, _ = ioutil.TempFile("", "config_test")
 	s.file.Close()
 	vars["num"] = 12345
 	vars["f"] = 1.2345
