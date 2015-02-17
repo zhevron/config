@@ -39,6 +39,7 @@ import (
 	"io/ioutil"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 // stringMap is a shorthand type for the map that holds the variables.
@@ -47,9 +48,13 @@ type stringMap map[string]interface{}
 // vars holds the variables currently loaded into the package.
 var vars stringMap
 
+// mutex holds the sync.Mutex used to control concurrent reads/writes.
+var mutex *sync.Mutex
+
 // Initialize the vars map on init.
 func init() {
 	vars = make(stringMap)
+	mutex = &sync.Mutex{}
 }
 
 // Load parses the JSON in data to it's internal map.
@@ -58,7 +63,9 @@ func Load(data string) error {
 	if err := json.Unmarshal([]byte(data), &m); err != nil {
 		return err
 	}
+	mutex.Lock()
 	vars = loadMap(m)
+	mutex.Unlock()
 	return nil
 }
 
@@ -77,7 +84,9 @@ func loadMap(m map[string]interface{}) stringMap {
 
 // Save returns the current configuration in JSON format.
 func Save() (string, error) {
+	mutex.Lock()
 	b, err := json.Marshal(&vars)
+	mutex.Unlock()
 	return string(b), err
 }
 
@@ -102,18 +111,25 @@ func SaveFile(path string) error {
 
 // Set sets a given value in the configuration to an arbitrary type.
 func Set(key string, val interface{}) {
+	mutex.Lock()
 	vars[key] = val
+	mutex.Unlock()
 }
 
 // Remove deletes the value with the given key from the configuration.
 func Remove(key string) {
+	mutex.Lock()
 	delete(vars, key)
+	mutex.Unlock()
 }
 
 // Get returns the value of the given key from the current configuration or the value of def if not found.
 // The value is returned as an interface{}.
 func Get(key string, def interface{}) interface{} {
-	return getFromMap(vars, key, def)
+	mutex.Lock()
+	v := getFromMap(vars, key, def)
+	mutex.Unlock()
+	return v
 }
 
 // getFromMap returns the value of the given key from the specified map or the value of def if not found.
