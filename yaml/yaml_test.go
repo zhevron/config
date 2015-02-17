@@ -13,207 +13,200 @@ func Test(t *testing.T) {
 	TestingT(t)
 }
 
-type GocfgYAMLSuite struct {
-	cfg *Configuration
-	yml string
-	f   *os.File
+type YAMLSuite struct {
+	data string
+	file *os.File
 }
 
-var _ = Suite(&GocfgYAMLSuite{})
+var _ = Suite(&YAMLSuite{})
 
-func (s *GocfgYAMLSuite) SetUpTest(c *C) {
-	s.cfg = NewConfiguration()
-	s.f, _ = ioutil.TempFile("", "gocfg")
-	s.f.Close()
-	s.cfg.values["num"] = 12345
-	s.cfg.values["f"] = 1.2345
-	s.cfg.values["str"] = "some string"
-	s.cfg.values["b"] = true
-	s.cfg.values["nested"] = make(stringMap)
-	s.cfg.values["nested"].(stringMap)["value"] = 1
+func (s *YAMLSuite) SetUpTest(c *C) {
+	s.file, _ = ioutil.TempFile("", "gocfg")
+	s.file.Close()
+	vars["num"] = 12345
+	vars["f"] = 1.2345
+	vars["str"] = "some string"
+	vars["b"] = true
+	vars["nested"] = make(stringMap)
+	vars["nested"].(stringMap)["value"] = 1
 }
 
-func (s *GocfgYAMLSuite) TearDownTest(c *C) {
-	os.Remove(s.f.Name())
+func (s *YAMLSuite) TearDownTest(c *C) {
+	os.Remove(s.file.Name())
 }
 
-func (s *GocfgYAMLSuite) TestNewConfiguration(c *C) {
-	cfg := NewConfiguration()
-	c.Check(cfg, Not(Equals), nil)
-}
-
-func (s *GocfgYAMLSuite) TestConfigurationLoad(c *C) {
+func (s *YAMLSuite) TestLoad(c *C) {
 	yml := "test: value"
-	err := s.cfg.Load(yml)
-	_, found := s.cfg.values["test"]
+	err := Load(yml)
+	_, found := vars["test"]
 	c.Check(err, Equals, nil)
 	c.Check(found, Equals, true)
 	yml = `
 illegalyaml
 test: value
 `
-	err = s.cfg.Load(yml)
+	err = Load(yml)
 	c.Check(err, Not(Equals), nil)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationSave(c *C) {
-	yml, err := s.cfg.Save()
+func (s *YAMLSuite) TestSave(c *C) {
+	yml, err := Save()
 	c.Check(err, Equals, nil)
 	c.Check(len(yml), Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationLoadFile(c *C) {
+func (s *YAMLSuite) TestLoadFile(c *C) {
 	yml := `
 test: value
 other:
   nested: 0
 `
-	f, _ := os.Create(s.f.Name())
+	f, _ := os.Create(s.file.Name())
 	f.WriteString(yml)
 	f.Close()
-	err := s.cfg.LoadFile(s.f.Name())
-	_, found := s.cfg.values["test"]
+	err := LoadFile(s.file.Name())
+	_, found := vars["test"]
 	c.Check(err, Equals, nil)
 	c.Check(found, Equals, true)
-	err = s.cfg.LoadFile("nonexistant.file")
+	err = LoadFile("nonexistant.file")
 	c.Check(err, Not(Equals), nil)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationSaveFile(c *C) {
-	err := s.cfg.SaveFile(s.f.Name())
-	fi, _ := os.Stat(s.f.Name())
+func (s *YAMLSuite) TestSaveFile(c *C) {
+	err := SaveFile(s.file.Name())
+	fi, _ := os.Stat(s.file.Name())
 	c.Check(err, Equals, nil)
 	c.Check(fi.Size(), Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationSet(c *C) {
-	s.cfg.Set("test", "value")
-	v, found := s.cfg.values["test"]
+func (s *YAMLSuite) TestSet(c *C) {
+	Set("test", "value")
+	v, found := vars["test"]
 	c.Check(found, Equals, true)
 	c.Check(v, Equals, "value")
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationRemove(c *C) {
-	s.cfg.values["test"] = "value"
-	s.cfg.Remove("test")
-	_, found := s.cfg.values["test"]
+func (s *YAMLSuite) TestRemove(c *C) {
+	vars["test"] = "value"
+	Remove("test")
+	_, found := vars["test"]
 	c.Check(found, Equals, false)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGet(c *C) {
-	s.cfg.values["test"] = "value"
-	v := s.cfg.Get("test", "default")
+func (s *YAMLSuite) TestGet(c *C) {
+	vars["test"] = "value"
+	v := Get("test", "default")
 	c.Check(v, Equals, "value")
-	v = s.cfg.Get("nested.value", "default")
+	v = Get("nested.value", "default")
 	c.Check(v, Not(Equals), "default")
-	v = s.cfg.Get("nonexistant", "default")
+	v = Get("nonexistant", "default")
 	c.Check(v, Equals, "default")
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetInt(c *C) {
-	v := s.cfg.GetInt("num", 0)
+func (s *YAMLSuite) TestGetInt(c *C) {
+	v := GetInt("num", 0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Int)
 	c.Check(v, Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetInt8(c *C) {
-	v := s.cfg.GetInt8("num", 0)
+func (s *YAMLSuite) TestGetInt8(c *C) {
+	v := GetInt8("num", 0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Int8)
 	c.Check(v, Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetInt16(c *C) {
-	v := s.cfg.GetInt16("num", 0)
+func (s *YAMLSuite) TestGetInt16(c *C) {
+	v := GetInt16("num", 0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Int16)
 	c.Check(v, Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetInt32(c *C) {
-	v := s.cfg.GetInt32("num", 0)
+func (s *YAMLSuite) TestGetInt32(c *C) {
+	v := GetInt32("num", 0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Int32)
 	c.Check(v, Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetInt64(c *C) {
-	v := s.cfg.GetInt64("num", 0)
+func (s *YAMLSuite) TestGetInt64(c *C) {
+	v := GetInt64("num", 0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Int64)
 	c.Check(v, Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetUint(c *C) {
-	v := s.cfg.GetUint("num", 0)
+func (s *YAMLSuite) TestGetUint(c *C) {
+	v := GetUint("num", 0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Uint)
 	c.Check(v, Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetUint8(c *C) {
-	v := s.cfg.GetUint8("num", 0)
+func (s *YAMLSuite) TestGetUint8(c *C) {
+	v := GetUint8("num", 0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Uint8)
 	c.Check(v, Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetUint16(c *C) {
-	v := s.cfg.GetUint16("num", 0)
+func (s *YAMLSuite) TestGetUint16(c *C) {
+	v := GetUint16("num", 0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Uint16)
 	c.Check(v, Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetUint32(c *C) {
-	v := s.cfg.GetUint32("num", 0)
+func (s *YAMLSuite) TestGetUint32(c *C) {
+	v := GetUint32("num", 0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Uint32)
 	c.Check(v, Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetUint64(c *C) {
-	v := s.cfg.GetUint64("num", 0)
+func (s *YAMLSuite) TestGetUint64(c *C) {
+	v := GetUint64("num", 0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Uint64)
 	c.Check(v, Not(Equals), 0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetFloat32(c *C) {
-	v := s.cfg.GetFloat32("f", 0.0)
+func (s *YAMLSuite) TestGetFloat32(c *C) {
+	v := GetFloat32("f", 0.0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Float32)
 	c.Check(v, Not(Equals), 0.0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetFloat64(c *C) {
-	v := s.cfg.GetFloat64("f", 0.0)
+func (s *YAMLSuite) TestGetFloat64(c *C) {
+	v := GetFloat64("f", 0.0)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Float64)
 	c.Check(v, Not(Equals), 0.0)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetBool(c *C) {
-	v := s.cfg.GetBool("b", false)
+func (s *YAMLSuite) TestGetBool(c *C) {
+	v := GetBool("b", false)
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.Bool)
 	c.Check(v, Not(Equals), false)
 }
 
-func (s *GocfgYAMLSuite) TestConfigurationGetString(c *C) {
-	v := s.cfg.GetString("str", "default")
+func (s *YAMLSuite) TestGetString(c *C) {
+	v := GetString("str", "default")
 	c.Check(reflect.TypeOf(v).Kind(), Equals, reflect.String)
 	c.Check(v, Not(Equals), "default")
 }
 
-func (s *GocfgYAMLSuite) BenchmarkConfigurationLoad(c *C) {
+func (s *YAMLSuite) BenchmarkConfigurationLoad(c *C) {
 	for i := 0; i < c.N; i++ {
-		s.cfg.Load(s.yml)
+		Load(s.data)
 	}
 }
 
-func (s *GocfgYAMLSuite) BenchmarkConfigurationSave(c *C) {
+func (s *YAMLSuite) BenchmarkConfigurationSave(c *C) {
 	for i := 0; i < c.N; i++ {
-		s.cfg.Save()
+		Save()
 	}
 }
 
-func (s *GocfgYAMLSuite) BenchmarkConfigurationGet(c *C) {
+func (s *YAMLSuite) BenchmarkConfigurationGet(c *C) {
 	for i := 0; i < c.N; i++ {
-		s.cfg.Get("str", "default")
+		Get("str", "default")
 	}
 }
 
-func (s *GocfgYAMLSuite) BenchmarkConfigurationGetNested(c *C) {
+func (s *YAMLSuite) BenchmarkConfigurationGetNested(c *C) {
 	for i := 0; i < c.N; i++ {
-		s.cfg.Get("nested.value", "default")
+		Get("nested.value", "default")
 	}
 }
