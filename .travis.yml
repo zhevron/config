@@ -20,5 +20,6 @@ install:
 
 script:
   - go vet ./...
+  - go test -v -race ./... -check.v
   - go test -v ./... -check.v -check.b
   - ./test-coverage.sh

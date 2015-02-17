@@ -20,7 +20,7 @@ done
 
 # Failures have incomplete results, so don't send
 if [ -n "$COVERALLS_TOKEN" ] && [ "$fail" -eq 0 ]; then
-  $HOME/gopath/bin/goveralls -v -coverprofile=acc.out -service travis-ci -repotoken $COVERALLS_TOKEN
+  $HOME/gopath/bin/goveralls -v -coverprofile=acc.out -service travis-ci -repotoken $COVERALLS_TOKEN || fail=1
 fi
 
 rm -f acc.out
