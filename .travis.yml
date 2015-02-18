@@ -23,3 +23,11 @@ script:
   - go test -v -race ./... -check.v
   - go test -v ./... -check.v -check.b
   - ./test-coverage.sh
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/b1804d21f1846505a0d1
+    on_success: change
+    on_failure: always
+    on_start: false
