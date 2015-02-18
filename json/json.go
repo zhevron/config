@@ -2,36 +2,7 @@
 // Use of this source code is governed by the MIT license.
 // See LICENSE.md for details.
 
-// Package json implements a way to easily read and write JSON configuration files.
-//
-// To read a configuration file, simply call the LoadFile method on a new Configuration object:
-//		import cfg "gopkg.in/zhevron/config.v1/json"
-//		if err := cfg.LoadFile("/path/to/file.json"); err != nil {
-//			// Failed to load the configuration file
-//		}
-//
-// To save the current configuration to a file, call the SaveFile method:
-//		if err := cfg.SaveFile("/path/to/file.json"); err != nil {
-//			// Failed to save the configuration file
-//		}
-//
-// You can easily access values with the Get method or any of the Get_Type_ methods:
-//		host := cfg.GetString("host", "localhost")
-//		port := cfg.GetInt("port", 10000)
-//
-// You can just as easily set a value using the Set method:
-//		cfg.Set("host", host)
-//		cfg.Set("port", port)
-//
-// Nested objects are accessed by adding a dot (.) between the value names.
-// If you have a JSON file that looks like:
-//		{
-//			"some": {
-//				"value": 1
-//			}
-//		}
-// The value can be accessed by calling the Get method:
-//		val := cfg.GetInt("some.value", 1)
+// Package json implements functions to read and write JSON configuration files.
 package json
 
 import (
@@ -69,7 +40,8 @@ func Load(data string) error {
 	return nil
 }
 
-// loadMap parses a loaded map structure and adds it to the current configuration.
+// loadMap parses a loaded map structure and adds it to the current
+// configuration.
 func loadMap(m map[string]interface{}) stringMap {
 	res := make(stringMap)
 	for k, v := range m {
@@ -123,7 +95,8 @@ func Remove(key string) {
 	mutex.Unlock()
 }
 
-// Get returns the value of the given key from the current configuration or the value of def if not found.
+// Get returns the value of the given key from the current configuration or the
+// value of def if not found.
 // The value is returned as an interface{}.
 func Get(key string, def interface{}) interface{} {
 	mutex.Lock()
@@ -132,7 +105,8 @@ func Get(key string, def interface{}) interface{} {
 	return v
 }
 
-// getFromMap returns the value of the given key from the specified map or the value of def if not found.
+// getFromMap returns the value of the given key from the specified map or the
+// value of def if not found.
 // The value is returned as an interface{}.
 // If the key contains a dot (.), the function will be called recursively.
 func getFromMap(m stringMap, key string, def interface{}) interface{} {
@@ -145,85 +119,112 @@ func getFromMap(m stringMap, key string, def interface{}) interface{} {
 	return def
 }
 
-// GetInt returns the value of the given key from the current configuration or the value of def if not found.
+// GetInt returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as an int.
+// For example usage, see the GetString examples.
 func GetInt(key string, def int) int {
 	return Get(key, def).(int)
 }
 
-// GetInt8 returns the value of the given key from the current configuration or the value of def if not found.
+// GetInt8 returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as an int8.
+// For example usage, see the GetString examples.
 func GetInt8(key string, def int8) int8 {
 	return int8(Get(key, def).(int))
 }
 
-// GetInt16 returns the value of the given key from the current configuration or the value of def if not found.
+// GetInt16 returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as an int16.
+// For example usage, see the GetString examples.
 func GetInt16(key string, def int16) int16 {
 	return int16(Get(key, def).(int))
 }
 
-// GetInt32 returns the value of the given key from the current configuration or the value of def if not found.
+// GetInt32 returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as an int32.
+// For example usage, see the GetString examples.
 func GetInt32(key string, def int32) int32 {
 	return int32(Get(key, def).(int))
 }
 
-// GetInt64 returns the value of the given key from the current configuration or the value of def if not found.
+// GetInt64 returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as an int64.
+// For example usage, see the GetString examples.
 func GetInt64(key string, def int64) int64 {
 	return int64(Get(key, def).(int))
 }
 
-// GetUint returns the value of the given key from the current configuration or the value of def if not found.
+// GetUint returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as an uint.
+// For example usage, see the GetString examples.
 func GetUint(key string, def uint) uint {
 	return uint(Get(key, def).(int))
 }
 
-// GetUint8 returns the value of the given key from the current configuration or the value of def if not found.
+// GetUint8 returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as an uint8.
+// For example usage, see the GetString examples.
 func GetUint8(key string, def uint8) uint8 {
 	return uint8(Get(key, def).(int))
 }
 
-// GetUint16 returns the value of the given key from the current configuration or the value of def if not found.
+// GetUint16 returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as an uint16.
+// For example usage, see the GetString examples.
 func GetUint16(key string, def uint16) uint16 {
 	return uint16(Get(key, def).(int))
 }
 
-// GetUint32 returns the value of the given key from the current configuration or the value of def if not found.
+// GetUint32 returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as an uint32.
+// For example usage, see the GetString examples.
 func GetUint32(key string, def uint32) uint32 {
 	return uint32(Get(key, def).(int))
 }
 
-// GetUint64 returns the value of the given key from the current configuration or the value of def if not found.
+// GetUint64 returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as an uint64.
+// For example usage, see the GetString examples.
 func GetUint64(key string, def uint64) uint64 {
 	return uint64(Get(key, def).(int))
 }
 
-// GetFloat32 returns the value of the given key from the current configuration or the value of def if not found.
+// GetFloat32 returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as a float32.
+// For example usage, see the GetString examples.
 func GetFloat32(key string, def float32) float32 {
 	return float32(Get(key, def).(float64))
 }
 
-// GetFloat64 returns the value of the given key from the current configuration or the value of def if not found.
+// GetFloat64 returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as a float64.
+// For example usage, see the GetString examples.
 func GetFloat64(key string, def float64) float64 {
 	return Get(key, def).(float64)
 }
 
-// GetBool returns the value of the given key from the current configuration or the value of def if not found.
+// GetBool returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as a bool.
+// For example usage, see the GetString examples.
 func GetBool(key string, def bool) bool {
 	return Get(key, def).(bool)
 }
 
-// GetString returns the value of the given key from the current configuration or the value of def if not found.
+// GetString returns the value of the given key from the current configuration
+// or the value of def if not found.
 // The value is returns as a string.
 func GetString(key string, def string) string {
 	return Get(key, def).(string)
