@@ -117,7 +117,9 @@ func Get(key string, def interface{}) interface{} {
 func getFromMap(m stringMap, key string, def interface{}) interface{} {
 	if n := strings.Index(key, "."); n != -1 {
 		if _, found := m[key[:n]]; found {
-			return getFromMap(m[key[:n]].(stringMap), key[n+1:], def)
+			if _, ok := m[key[:n]].(stringMap); ok {
+				return getFromMap(m[key[:n]].(stringMap), key[n+1:], def)
+			}
 		}
 		return def
 	}

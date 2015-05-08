@@ -96,6 +96,8 @@ func (s *JSONSuite) TestGet(c *C) {
 	c.Check(v, Equals, "default")
 	v = Get("nonexistant.nested", "default")
 	c.Check(v, Equals, "default")
+	v = Get("test.nested", "default")
+	c.Check(v, Equals, "default")
 }
 
 func (s *JSONSuite) TestGetInt(c *C) {
