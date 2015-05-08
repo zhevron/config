@@ -116,7 +116,10 @@ func Get(key string, def interface{}) interface{} {
 // If the key contains a dot (.), the function will be called recursively.
 func getFromMap(m stringMap, key string, def interface{}) interface{} {
 	if n := strings.Index(key, "."); n != -1 {
-		return getFromMap(m[key[:n]].(stringMap), key[n+1:], def)
+		if _, found := m[key[:n]]; found {
+			return getFromMap(m[key[:n]].(stringMap), key[n+1:], def)
+		}
+		return def
 	}
 	if v, found := m[key]; found {
 		return v
