@@ -1,17 +1,12 @@
-// Copyright (C) 2014-2015 Thomas Lokshall
-// Use of this source code is governed by the MIT license.
-// See LICENSE.md for details.
-
-// Package json implements functions to read and write JSON configuration files.
-package json
+package config
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"reflect"
 	"strings"
 	"sync"
 )
+
+// interfaceMap is a shorthand type required by the YAML library.
+type interfaceMap map[interface{}]interface{}
 
 // stringMap is a shorthand type for the map that holds the variables.
 type stringMap map[string]interface{}
@@ -26,59 +21,6 @@ var mutex *sync.Mutex
 func init() {
 	vars = make(stringMap)
 	mutex = &sync.Mutex{}
-}
-
-// Load parses the JSON in data to it's internal map.
-func Load(data string) error {
-	m := make(stringMap)
-	if err := json.Unmarshal([]byte(data), &m); err != nil {
-		return err
-	}
-	mutex.Lock()
-	vars = loadMap(m)
-	mutex.Unlock()
-	return nil
-}
-
-// loadMap parses a loaded map structure and adds it to the current
-// configuration.
-func loadMap(m map[string]interface{}) stringMap {
-	res := make(stringMap)
-	for k, v := range m {
-		if reflect.TypeOf(v).Kind() == reflect.Map {
-			res[k] = loadMap(v.(map[string]interface{}))
-		} else {
-			res[k] = v
-		}
-	}
-	return res
-}
-
-// Save returns the current configuration in JSON format.
-func Save() (string, error) {
-	mutex.Lock()
-	b, err := json.Marshal(&vars)
-	mutex.Unlock()
-	return string(b), err
-}
-
-// LoadFile reads a specified file into memory and parses it using Load().
-func LoadFile(path string) error {
-	b, err := ioutil.ReadFile(path)
-	if err != nil {
-		return err
-	}
-	jsonData := string(b[:])
-	return Load(jsonData)
-}
-
-// SaveFile writes the output from Save() to the specified file.
-func SaveFile(path string) error {
-	data, err := Save()
-	if err == nil {
-		err = ioutil.WriteFile(path, []byte(data), 0644)
-	}
-	return err
 }
 
 // Set sets a given value in the configuration to an arbitrary type.
@@ -133,7 +75,7 @@ func GetInt(key string, def int) int {
 }
 
 // GetInt8 returns the value of the given key from the current configuration
-// or the value of def if not found.
+//or the value of def if not found.
 // The value is returns as an int8.
 // For example usage, see the GetString examples.
 func GetInt8(key string, def int8) int8 {
