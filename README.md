@@ -1,32 +1,41 @@
-go-config - Simple configuration file library
-=============================================
+config - Simple configuration file library
+==========================================
 
-[![wercker status](https://app.wercker.com/status/02afb0690aca4afe47e960ca6b7b04fd/s "wercker status")](https://app.wercker.com/project/bykey/02afb0690aca4afe47e960ca6b7b04fd)
-[![Coverage Status](https://coveralls.io/repos/zhevron/go-config/badge.svg?branch=master)](https://coveralls.io/r/zhevron/go-config?branch=master)
+[![wercker status](https://app.wercker.com/status/e7ff76576fa4b805c007f48a2377a925/s/master "wercker status")](https://app.wercker.com/project/bykey/e7ff76576fa4b805c007f48a2377a925)
+[![Coverage Status](https://coveralls.io/repos/zhevron/config/badge.svg?branch=master&service=github)](https://coveralls.io/github/zhevron/config?branch=master)
+[![GoDoc](https://godoc.org/github.com/zhevron/config?status.svg)](https://godoc.org/github.com/zhevron/config)
 
-**go-config** is a simple configuration file library for [Go](https://golang.org/).  
-To use the library, you need to install one of the implementations below.
+**config** is a simple configuration file library for [Google Go](https://golang.org).  
+For full package documentation, see the GoDoc link above.
 
-## JSON
+## Usage
 
-[![GoDoc](https://godoc.org/gopkg.in/zhevron/go-config.v0/json?status.svg)](https://godoc.org/gopkg.in/zhevron/go-config.v0/json)
-
-This implementation reads and write [JSON](http://json.org/) files.
-
+### Get/Set values
+```go
+config.GetString("var", "default")
+config.Set("var", value)
 ```
-go get gopkg.in/zhevron/go-config.v0/json
+
+### Load/Save JSON
+```go
+if err := config.LoadFileJSON(filename); err != nil {
+  panic(err) // Failed to load configuration file
+}
+if err := config.SaveFileJSON(filename); err != nil {
+  panic(err) // Failed to save configuration file
+}
 ```
 
-## YAML
-
-[![GoDoc](https://godoc.org/gopkg.in/zhevron/go-config.v0/yaml?status.svg)](https://godoc.org/gopkg.in/zhevron/go-config.v0/yaml)
-
-This implementation reads and writes [YAML](http://www.yaml.org/) files.
-
-```
-go get gopkg.in/zhevron/go-config.v0/yaml
+### Load/Save YAML
+```go
+if err := config.LoadFileYAML(filename); err != nil {
+  panic(err) // Failed to load configuration file
+}
+if err := config.SaveFileYAML(filename); err != nil {
+  panic(err) // Failed to save configuration file
+}
 ```
 
 ## License
 
-**go-config** is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+**config** is licensed under the [MIT license](http://opensource.org/licenses/MIT).
