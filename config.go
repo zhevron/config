@@ -1,4 +1,3 @@
-// Package config implements functions to read and write configuration files.
 package config
 
 import (
